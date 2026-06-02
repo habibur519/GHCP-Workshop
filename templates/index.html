@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rock Paper Scissors Lizard Spock</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2rem; max-width: 650px; margin: auto; }
+    h1 { margin-bottom: 0.5rem; }
+    .choices { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+    button.choice { padding: 0.75rem 1rem; border: 1px solid #666; border-radius: 0.5rem; background: #f4f4f4; cursor: pointer; }
+    button.choice:hover { background: #e0e0e0; }
+    button.choice.active { background: #0078d4; color: white; border-color: #0063b1; }
+    #playButton { margin-top: 1rem; padding: 0.85rem 1.2rem; font-size: 1rem; }
+    #result { margin-top: 1.5rem; padding: 1rem; border: 1px solid #ddd; border-radius: 0.5rem; background: #fafafa; }
+    #error { color: #b00020; }
+  </style>
+</head>
+<body>
+  <h1>Rock Paper Scissors Lizard Spock</h1>
+  <p>Select one option and click <strong>Play</strong> to send a POST request to the API.</p>
+
+  <div class="choices" id="choices"></div>
+  <button id="playButton">Play</button>
+
+  <div id="result" hidden>
+    <p><strong>Your choice:</strong> <span id="userChoice"></span></p>
+    <p><strong>Computer choice:</strong> <span id="computerChoice"></span></p>
+    <p><strong>Result:</strong> <span id="gameResult"></span></p>
+    <p id="error"></p>
+  </div>
+
+  <script>
+    const options = ["rock", "paper", "scissors", "lizard", "spock"];
+    const choicesContainer = document.getElementById("choices");
+    let selectedChoice = options[0];
+
+    options.forEach(choice => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "choice";
+      button.textContent = choice;
+      button.addEventListener("click", () => {
+        selectedChoice = choice;
+        document.querySelectorAll("button.choice").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+      });
+      if (choice === selectedChoice) {
+        button.classList.add("active");
+      }
+      choicesContainer.appendChild(button);
+    });
+
+    document.getElementById("playButton").addEventListener("click", async () => {
+      const result = document.getElementById("result");
+      const userChoiceEl = document.getElementById("userChoice");
+      const computerChoiceEl = document.getElementById("computerChoice");
+      const gameResultEl = document.getElementById("gameResult");
+      const errorEl = document.getElementById("error");
+
+      result.hidden = true;
+      errorEl.textContent = "";
+
+      try {
+        const response = await fetch("/play", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ choice: selectedChoice }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          errorEl.textContent = data.error || "Something went wrong.";
+          result.hidden = false;
+          return;
+        }
+
+        userChoiceEl.textContent = data.user_choice;
+        computerChoiceEl.textContent = data.computer_choice;
+        gameResultEl.textContent = data.result;
+        result.hidden = false;
+      } catch (error) {
+        errorEl.textContent = "Network error. Please try again.";
+        result.hidden = false;
+      }
+    });
+  </script>
+</body>
+</html>

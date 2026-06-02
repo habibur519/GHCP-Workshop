@@ -40,8 +40,52 @@ In this project you will find:
 * an `.instructions` folder all the instructions for this workshop.
 * an `assets` folder containing images used in this workshop documentation.
 * a `.tours` folder that includes the CodeTour file if you wish to use it.
+## Running locally
 
+### Install dependencies
 
+```bash
+python -m pip install -r requirements.txt
+```
+
+### Run the command-line game
+
+```bash
+python main.py
+```
+
+Then enter one of: `rock`, `paper`, `scissors`, `lizard`, or `spock`.
+
+### Run the REST API
+
+```bash
+python app.py
+```
+
+Open the browser UI at:
+
+```text
+http://127.0.0.1:5000/
+```
+
+API examples:
+
+```bash
+curl -X POST http://127.0.0.1:5000/rock
+curl -X POST http://127.0.0.1:5000/play -H "Content-Type: application/json" -d '{"choice": "spock"}'
+```
+
+The API returns JSON with:
+
+- `user_choice`
+- `computer_choice`
+- `result` (`tie`, `user`, or `computer`)
+
+### Run tests
+
+```bash
+python -m pytest -q
+```
 
 
 ## FAQ 
